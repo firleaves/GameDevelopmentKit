@@ -9,20 +9,30 @@ namespace ET
 {
     public static class GenerateUGFEntityId
     {
-        private static readonly string s_LubanEntityAsset = Path.GetFullPath("../Unity/Assets/Res/Editor/Luban/dtentity.json");
-
+        public static string UnityPath = "../Unity/Assets/";
+        public static  string s_LubanEntityAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtentity.json");
+        public static void Reload()
+        {
+            s_LubanEntityAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtentity.json");
+        }
         public static void GenerateCode()
         {
             if (ExcelExporter.ExcelExporter_Luban.IsEnableET)
             {
                 GenerateCS("ET.Client", "UGFEntityId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFEntityId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFEntityId.cs"));
             }
 
             if (ExcelExporter.ExcelExporter_Luban.IsEnableGameHot)
             {
                 GenerateCS("Game.Hot", "EntityId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/Hot/Code/Runtime/Generate/UGF/EntityId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Hot/Code/Runtime/Generate/UGF/EntityId.cs"));
+            }
+            else
+            {
+                s_LubanEntityAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Luban/dtentity.json");
+                GenerateCS("Game", "EntityId",
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Generate/UGF/EntityId.cs"));
             }
         }
         
@@ -55,7 +65,7 @@ namespace ET
             stringBuilder.AppendLine($"namespace {nameSpaceName}");
             stringBuilder.AppendLine("{");
             stringBuilder.AppendLine("    /// <summary>");
-            stringBuilder.AppendLine("    /// 实体编号");
+            stringBuilder.AppendLine("    /// 实体编号。");
             stringBuilder.AppendLine("    /// </summary>");
             stringBuilder.AppendLine($"    public static class {className}");
             stringBuilder.AppendLine("    {");
@@ -68,7 +78,7 @@ namespace ET
                 }
                 stringBuilder.AppendLine("");
                 stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine($"        /// {drEntity.Desc}");
+                stringBuilder.AppendLine($"        /// {drEntity.Desc}。");
                 stringBuilder.AppendLine("        /// </summary>");
                 stringBuilder.AppendLine($"        public const int {drEntity.CSName} = {drEntity.Id};");
             }
@@ -86,6 +96,12 @@ namespace ET
                 File.WriteAllText(codeFile, codeContent);
                 Log.Info($"Generate code : {codeFile}!");
             }
+        }
+
+        private static string GetEntityName(DREntity drEntity)
+        {
+            return drEntity.AssetName.EndsWith("Entity", StringComparison.OrdinalIgnoreCase)
+                    ? drEntity.AssetName.Substring(0, drEntity.AssetName.Length - 6) : drEntity.AssetName;
         }
     }
 }

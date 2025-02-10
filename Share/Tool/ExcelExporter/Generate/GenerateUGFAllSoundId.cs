@@ -9,30 +9,50 @@ namespace ET
 {
     public static class GenerateUGFAllSoundId
     {
-        private static readonly string s_LubanMusicAsset = Path.GetFullPath("../Unity/Assets/Res/Editor/Luban/dtmusic.json");
-        private static readonly string s_LubanUISoundAsset = Path.GetFullPath("../Unity/Assets/Res/Editor/Luban/dtuisound.json");
-        private static readonly string s_LubanSoundAsset = Path.GetFullPath("../Unity/Assets/Res/Editor/Luban/dtsound.json");
+        public static string UnityPath = "../Unity/Assets/";
+        public static  string s_LubanMusicAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtmusic.json");
+        public static  string s_LubanUISoundAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtuisound.json");
+        public static  string s_LubanSoundAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtsound.json");
 
+        public static void Reload()
+        {
+            s_LubanMusicAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtmusic.json");
+            s_LubanUISoundAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtuisound.json");
+            s_LubanSoundAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Hot/Luban/dtsound.json");
+        }
         public static void GenerateCode()
         {
             if (ExcelExporter.ExcelExporter_Luban.IsEnableET)
             {
                 GenerateCS_Music("ET.Client", "UGFMusicId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFMusicId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFMusicId.cs"));
                 GenerateCS_UISound("ET.Client", "UGFUISoundId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFUISoundId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFUISoundId.cs"));
                 GenerateCS_Sound("ET.Client", "UGFSoundId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFSoundId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/ET/Code/ModelView/Client/Generate/UGF/UGFSoundId.cs"));
             }
 
             if (ExcelExporter.ExcelExporter_Luban.IsEnableGameHot)
             {
                 GenerateCS_Music("Game.Hot", "MusicId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/Hot/Code/Runtime/Generate/UGF/MusicId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Hot/Code/Runtime/Generate/UGF/MusicId.cs"));
                 GenerateCS_UISound("Game.Hot", "UISoundId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/Hot/Code/Runtime/Generate/UGF/UISoundId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Hot/Code/Runtime/Generate/UGF/UISoundId.cs"));
                 GenerateCS_Sound("Game.Hot", "SoundId",
-                    Path.GetFullPath("../Unity/Assets/Scripts/Game/Hot/Code/Runtime/Generate/UGF/SoundId.cs"));
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Hot/Code/Runtime/Generate/UGF/SoundId.cs"));
+            }
+            else
+            {
+
+                s_LubanMusicAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Luban/dtmusic.json");
+                s_LubanUISoundAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Luban/dtuisound.json");
+                s_LubanSoundAsset = Path.GetFullPath($"{UnityPath}/Res/Editor/Luban/dtsound.json");
+                GenerateCS_Music("Game", "MusicId",
+                   Path.GetFullPath($"{UnityPath}/Scripts/Game/Generate/UGF/MusicId.cs"));
+                GenerateCS_UISound("Game", "UISoundId",
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Generate/UGF/UISoundId.cs"));
+                GenerateCS_Sound("Game", "SoundId",
+                    Path.GetFullPath($"{UnityPath}/Scripts/Game/Generate/UGF/SoundId.cs"));
             }
         }
         
@@ -65,7 +85,7 @@ namespace ET
             stringBuilder.AppendLine($"namespace {nameSpaceName}");
             stringBuilder.AppendLine("{");
             stringBuilder.AppendLine("    /// <summary>");
-            stringBuilder.AppendLine("    /// 音乐编号");
+            stringBuilder.AppendLine("    /// 音乐编号。");
             stringBuilder.AppendLine("    /// </summary>");
             stringBuilder.AppendLine($"    public static class {className}");
             stringBuilder.AppendLine("    {");
@@ -78,7 +98,7 @@ namespace ET
                 }
                 stringBuilder.AppendLine("");
                 stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine($"        /// {drMusic.Desc}");
+                stringBuilder.AppendLine($"        /// {drMusic.Desc}。");
                 stringBuilder.AppendLine("        /// </summary>");
                 stringBuilder.AppendLine($"        public const int {drMusic.CSName} = {drMusic.Id};");
             }

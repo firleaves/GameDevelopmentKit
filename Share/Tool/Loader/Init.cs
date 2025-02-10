@@ -1,11 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using CommandLine;
+using Newtonsoft.Json;
 
 namespace ET.Server
 {
     internal static class Init
     {
+        public static ToolConfig GToolConfig;
+
         private static int Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -33,6 +37,23 @@ namespace ET.Server
                     Log.Error("工作目录不能包含空格");
                     return 1;
                 }
+                
+                if(!string.IsNullOrEmpty(Options.Instance.ToolConfig))
+                {
+                    try
+                    {
+                        string jsonData = File.ReadAllText(Options.Instance.ToolConfig);
+                        GToolConfig = JsonConvert.DeserializeObject<ToolConfig>(jsonData);
+                        Console.WriteLine(GToolConfig);
+
+                    }
+                    catch(Exception e) 
+                    {
+                        throw new Exception($"读取{Options.Instance.ToolConfig}失败 {e.Message}");
+                    }
+                    
+                }
+
 
                 Log.Info($"server start........................ ");
                 switch (Options.Instance.AppType)

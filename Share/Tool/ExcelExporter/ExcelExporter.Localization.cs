@@ -15,10 +15,10 @@ namespace ET
     {
         public static class ExcelExporter_Localization
         {
-            private static readonly string s_LocalizationOutPutDir = Path.GetFullPath("../Unity/Assets/Res/Localization");
-            private static readonly string s_AssetUtilityCodeFile = Path.GetFullPath("../Unity/Assets/Scripts/Game/Generate/Localization/AssetUtility.Localization.cs");
-            private static readonly string s_LocalizationReadyLanguageCodeFile = Path.GetFullPath("../Unity/Assets/Scripts/Game/Editor/Generate/Localization/LocalizationReadyLanguage.cs");
-            private static readonly string s_UXToolEditorLocalizationToolCodeFile = Path.GetFullPath("../Unity/Assets/Scripts/Library/UXTool/Editor/Common/EditorLocalization/EditorLocalizationTool.Generate.cs");
+            public static  string s_LocalizationOutPutDir = Path.GetFullPath("../Unity/Assets/Res/Localization");
+            public static  string s_AssetUtilityCodeFile = Path.GetFullPath("../Unity/Assets/Scripts/Game/Generate/Localization/AssetUtility.Localization.cs");
+            public static  string s_LocalizationReadyLanguageCodeFile = Path.GetFullPath("../Unity/Assets/Scripts/Game/Editor/Generate/Localization/LocalizationReadyLanguage.cs");
+            public static  string s_UXToolEditorLocalizationToolCodeFile = Path.GetFullPath("../Unity/Assets/Scripts/Library/UXTool/Editor/Common/EditorLocalization/EditorLocalizationTool.Generate.cs");
 
             private struct LanguageTableInfo
             {

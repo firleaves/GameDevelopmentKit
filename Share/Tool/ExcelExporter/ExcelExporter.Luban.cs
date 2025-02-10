@@ -22,10 +22,10 @@ namespace ET
             private static readonly string s_LubanCommandHeaderTemplate =
                     $"dotnet %GEN_CLIENT% --customTemplateDir %CUSTOM_TEMPLATE_DIR% --conf %CONF_ROOT%/luban.conf ";
 
-            private const string GEN_CLIENT = "../Tools/Luban/Tools/Luban/Luban.dll";
-            private const string CUSTOM_TEMPLATE_DIR = "../Tools/Luban/CustomTemplates";
-            private const string EXCEL_DIR = "../Design/Excel";
-            private const string GEN_CONFIG_NAME = "luban.conf";
+            public static string GEN_CLIENT = "../Tools/Luban/Tools/Luban/Luban.dll";
+            public static string CUSTOM_TEMPLATE_DIR = "../Tools/Luban/CustomTemplates";
+            public static string EXCEL_DIR = "../Design/Excel";
+            private static string GEN_CONFIG_NAME = "luban.conf";
 
             private static Encoding s_Encoding;
 
@@ -81,20 +81,6 @@ namespace ET
                 dirList.Sort();
                 dirs = dirList.ToArray();
 
-                for (int i = 0; i < dirs.Length; i++)
-                {
-                    string dir = Path.GetFullPath(dirs[i]);
-                    string genConfigFile = Path.Combine(dir, GEN_CONFIG_NAME);
-                    if (string.Equals(Directory.GetParent(genConfigFile).Name, "ET", StringComparison.Ordinal))
-                    {
-                        IsEnableET = true;
-                    }
-                    else if (string.Equals(Directory.GetParent(genConfigFile).Name, "GameHot", StringComparison.Ordinal))
-                    {
-                        IsEnableGameHot = true;
-                    }
-                }
-
                 List<CmdInfo> cmdInfos = new List<CmdInfo>();
                 for (int i = 0; i < dirs.Length; i++)
                 {
@@ -104,7 +90,7 @@ namespace ET
                     {
                         continue;
                     }
-
+                    Console.WriteLine("读取json " + genConfigFile);
                     var genConfig = JsonSerializer.Deserialize<GenConfig>(
                         File.ReadAllText(genConfigFile, Encoding.UTF8).Replace("\r\n", " ").Replace("\n", " ").Replace("\u0009", " "),
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -112,6 +98,18 @@ namespace ET
                     {
                         continue;
                     }
+
+                    if (string.Equals(Directory.GetParent(genConfigFile).Name, "ET", StringComparison.Ordinal))
+                    {
+                        IsEnableET = true;
+                    }
+                    else if (string.Equals(Directory.GetParent(genConfigFile).Name, "GameHot", StringComparison.Ordinal))
+                    {
+                        IsEnableGameHot = true;
+                    }
+                    Console.WriteLine("打印信息");
+                    Console.WriteLine(ExcelExporter.ExcelExporter_Luban.IsEnableET);
+                    Console.WriteLine(ExcelExporter.ExcelExporter_Luban.IsEnableGameHot);
 
                     int lastIndex = dir.LastIndexOf(Path.DirectorySeparatorChar) + 1;
                     string dirName = dir.Substring(lastIndex, dir.Length - lastIndex);
@@ -257,7 +255,6 @@ namespace ET
                     GenerateUGFAllSoundId.GenerateCode();
                     GenerateUGFEntityId.GenerateCode();
                     GenerateUGFUIFormId.GenerateCode();
-                    GenerateUGFSceneId.GenerateCode();
                 }
 
                 if (isSuccess)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ET
 {
@@ -21,6 +22,7 @@ namespace ET
                 s_CSOutDirs = outDirs;
                 s_StartOpcode = opcode;
 
+                s_MsgOpcode.Clear();
                 s_StringBuilder = new StringBuilder();
                 s_StringBuilder.Append("// This is an automatically generated class by Share.Tool. Please do not modify it.\n");
                 s_StringBuilder.Append("\n");
@@ -34,23 +36,35 @@ namespace ET
 
             public static void Stop()
             {
+                s_StringBuilder.Append("\tpublic static partial class " + s_CSName + "\n\t{\n");
+                foreach (OpcodeInfo info in s_MsgOpcode)
+                {
+                    Console.WriteLine($"msgName = {info.name} , Id = {info.opcode}");
+                    s_StringBuilder.Append($"\t\t public const ushort {info.name} = {info.opcode};\n");
+                }
+
+                s_StringBuilder.Append("\t}\n");
+
                 s_StringBuilder.Append("}\n");
                 foreach (var csOutDir in s_CSOutDirs)
                 {
                     GenerateCS(s_StringBuilder, csOutDir, s_CSName);
                 }
+                // Console.WriteLine($"{s_StringBuilder.ToString()} ");
             }
 
             public static void Proto2CS(string protoFile)
             {
                 string s = File.ReadAllText(protoFile);
-                
+
                 bool isMsgStart = false;
                 StringBuilder disposeSb = new StringBuilder();
+                string msgName = string.Empty;
+                int messageId = 0;
                 foreach (string line in s.Split('\n'))
                 {
                     string newline = line.Trim();
-                    
+
                     if (string.IsNullOrEmpty(newline))
                     {
                         continue;
@@ -58,6 +72,13 @@ namespace ET
 
                     if (!isMsgStart && newline.StartsWith("//"))
                     {
+                        // 尝试匹配形如 "// 1003" 的 messageId
+                        Match match = Regex.Match(newline, @"^//\s*(\d+)$");
+                        if (match.Success)
+                        {
+                            messageId = int.Parse(match.Groups[1].Value);
+                        }
+
                         if (newline.StartsWith("///"))
                         {
                             s_StringBuilder.Append("\t/// <summary>\n");
@@ -68,6 +89,7 @@ namespace ET
                         {
                             s_StringBuilder.Append($"\t// {newline.TrimStart('/', ' ')}\n");
                         }
+
                         continue;
                     }
 
@@ -80,7 +102,7 @@ namespace ET
                         disposeSb.Append($"\t\tpublic override void Clear()\n");
                         disposeSb.Append("\t\t{\n");
 
-                        string msgName = newline.Split(s_SplitChars, StringSplitOptions.RemoveEmptyEntries)[1];
+                        msgName = newline.Split(s_SplitChars, StringSplitOptions.RemoveEmptyEntries)[1];
                         string[] ss = newline.Split(new[] { "//" }, StringSplitOptions.RemoveEmptyEntries);
 
                         if (ss.Length == 2)
@@ -93,24 +115,24 @@ namespace ET
                         s_StringBuilder.Append($"\tpublic partial class {msgName}");
                         if (string.IsNullOrEmpty(parentClass))
                         {
-                            if (msgName.StartsWith("CS", StringComparison.OrdinalIgnoreCase))
+                            if (msgName.StartsWith("c", StringComparison.OrdinalIgnoreCase))
                             {
                                 s_StringBuilder.Append(" : CSPacketBase\n");
                             }
-                            else if (msgName.StartsWith("SC", StringComparison.OrdinalIgnoreCase))
+                            else //if (msgName.StartsWith("SC", StringComparison.OrdinalIgnoreCase))
                             {
                                 s_StringBuilder.Append(" : SCPacketBase\n");
                             }
-                            else
-                            {
-                                throw new Exception("\n");
-                            }
+                            // else
+                            // {
+                            //     throw new Exception("\n");
+                            // }
                         }
                         else
                         {
                             s_StringBuilder.Append($" : {parentClass}\n");
                         }
-                        
+
                         continue;
                     }
 
@@ -119,7 +141,8 @@ namespace ET
                         if (newline.StartsWith("{"))
                         {
                             s_StringBuilder.Append("\t{\n");
-                            s_StringBuilder.Append($"\t\tpublic override int Id => {++s_StartOpcode};\n");
+                            s_StringBuilder.Append($"\t\tpublic override int Id => {messageId};\n");
+                            s_MsgOpcode.Add(new OpcodeInfo() { name = msgName, opcode = messageId });
                             continue;
                         }
 
@@ -200,7 +223,7 @@ namespace ET
                     ss = tail.Trim().Replace(";", "").Split(" ");
                     string v = ss[0];
                     string n = ss[2];
-                
+
                     sb.Append($"\t\t[ProtoMember({n})]\n");
                     sb.Append($"\t\tpublic Dictionary<{keyType}, {valueType}> {v} {{ get; set; }} = new Dictionary<{keyType}, {valueType}>();\n");
 

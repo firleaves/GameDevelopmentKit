@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using ET.Server;
 
 namespace ET
 {
@@ -33,6 +34,14 @@ namespace ET
         public static void Export()
         {
             Log.Info("proto2cs start!");
+
+            if (Init.GToolConfig != null)
+            {
+                 Define.UNITY_ASSETS_PATH = Init.GToolConfig.UnityAssetPath;
+            }
+            
+            Log.Info($"UNITY_ASSETS_PATH = {Define.UNITY_ASSETS_PATH}");
+            
             string[] childDirs = Directory.GetDirectories(PROTO_ROOT_DIR);
             if (childDirs.Length < 1)
             {
